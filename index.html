@@ -1,372 +1,1863 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>老師的手搖飲不能不加珍珠！</title>
-    <style>
-      * {
-        box-sizing: border-box
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>老師的手搖飲不能不加珍珠！</title>
+  <meta name="description" content="可愛手繪風 2D 物品接取網頁遊戲：幫老師收集黑糖珍珠，避開多餘的冰塊，在 30 秒內完成最完美的手搖飲！" />
+  <style>
+    :root {
+      --cream-bg: #fff8ee;
+      --cream-card: #fffdf8;
+      --cream-soft: #f7ebd9;
+      --milk-tea: #d8a373;
+      --milk-tea-light: #edd2b4;
+      --milk-tea-dark: #b97d4b;
+      --brown-sugar: #462819;
+      --brown-sugar-mid: #6b412b;
+      --caramel: #d97224;
+      --caramel-hover: #c36016;
+      --ice-blue: #65b6d8;
+      --ice-bg: #e7f6fc;
+      --danger: #c9483b;
+      --danger-bg: #fdebe8;
+      --success: #3e8554;
+      --success-bg: #eaf6ed;
+      --shadow-ink: rgba(70, 40, 25, 0.14);
+    }
 
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      background-color: var(--cream-bg);
+      color: var(--brown-sugar);
+      font-family: "PingFang TC", "Microsoft JhengHei", "Hiragino Sans GB", "Heiti TC", "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 12px;
+      background-image:
+        radial-gradient(circle at 14% 18%, rgba(216, 163, 115, 0.22) 0 18px, transparent 19px),
+        radial-gradient(circle at 86% 24%, rgba(185, 125, 75, 0.14) 0 12px, transparent 13px),
+        radial-gradient(circle at 12% 84%, rgba(70, 40, 25, 0.08) 0 10px, transparent 11px),
+        radial-gradient(circle at 89% 82%, rgba(216, 163, 115, 0.2) 0 20px, transparent 21px),
+        repeating-linear-gradient(
+          0deg,
+          rgba(70, 40, 25, 0.02) 0px,
+          rgba(70, 40, 25, 0.02) 1px,
+          transparent 1px,
+          transparent 28px
+        );
+    }
+
+    .game-shell {
+      width: 100%;
+      max-width: 780px;
+      height: min(94dvh, 720px);
+      display: flex;
+      flex-direction: column;
+      background: var(--cream-card);
+      border: 3px solid var(--brown-sugar);
+      border-radius: 26px;
+      box-shadow: 0 12px 0 var(--milk-tea), 0 22px 40px var(--shadow-ink);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 頂部標題與 HUD */
+    .hud-header {
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #fff5e6 0%, #f9e8d2 100%);
+      border-bottom: 3px solid var(--brown-sugar);
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hud-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: var(--brown-sugar);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sound-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 6px 14px;
+      border: 2.5px solid var(--brown-sugar);
+      border-radius: 14px;
+      background: var(--cream-card);
+      color: var(--brown-sugar);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--brown-sugar);
+      transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .sound-btn:hover {
+      background: #fff2df;
+    }
+
+    .sound-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--brown-sugar);
+    }
+
+    .sound-btn:focus-visible,
+    .primary-btn:focus-visible,
+    .secondary-btn:focus-visible {
+      outline: 3px solid var(--caramel);
+      outline-offset: 2px;
+    }
+
+    .hud-stats {
+      display: grid;
+      grid-template-columns: 1.1fr 1.2fr 1.1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stat-box {
+      background: var(--cream-card);
+      border: 2px solid var(--brown-sugar);
+      border-radius: 14px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 42px;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--brown-sugar-mid);
+      white-space: nowrap;
+    }
+
+    .stat-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--brown-sugar);
+      white-space: nowrap;
+    }
+
+    .timer-box {
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 12px;
+    }
+
+    .timer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .timer-bar-track {
+      width: 100%;
+      height: 8px;
+      background: var(--cream-soft);
+      border: 1.5px solid var(--brown-sugar);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .timer-bar-fill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--caramel), var(--milk-tea-dark));
+      border-radius: 999px;
+      transition: width 0.12s linear;
+    }
+
+    .timer-urgent .stat-value {
+      color: var(--danger);
+    }
+
+    .timer-urgent .timer-bar-fill {
+      background: linear-gradient(90deg, #e05244, #c9483b);
+    }
+
+    .hearts-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .heart-icon {
+      width: 19px;
+      height: 19px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .heart-lost {
+      opacity: 0.24;
+      transform: scale(0.84);
+    }
+
+    /* 遊戲畫布區 */
+    .stage-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      background: linear-gradient(180deg, #fffaf2 0%, #f8ebd7 72%, #ecd0ad 100%);
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+
+    canvas#gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    canvas#gameCanvas:active {
+      cursor: grabbing;
+    }
+
+    .speed-toast {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: #fff9f0;
+      border: 2px solid var(--brown-sugar);
+      border-radius: 12px;
+      padding: 5px 14px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--brown-sugar);
+      box-shadow: 0 3px 0 var(--milk-tea);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      white-space: nowrap;
+      z-index: 4;
+    }
+
+    .speed-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hurt-flash {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 6px solid rgba(101, 182, 216, 0.75);
+      background: radial-gradient(circle, transparent 58%, rgba(101, 182, 216, 0.22) 100%);
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      z-index: 3;
+    }
+
+    .hurt-flash.active {
+      opacity: 1;
+    }
+
+    /* 開始與結束覆蓋畫面 */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 248, 238, 0.92);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 10;
+      overflow-y: auto;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 540px;
+      background: var(--cream-card);
+      border: 3px solid var(--brown-sugar);
+      border-radius: 24px;
+      padding: 20px 22px;
+      box-shadow: 0 8px 0 var(--milk-tea);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mascot-badge {
+      width: 92px;
+      height: 92px;
+      flex-shrink: 0;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: clamp(1.25rem, 3.4vw, 1.65rem);
+      font-weight: 900;
+      line-height: 1.3;
+      color: var(--brown-sugar);
+    }
+
+    .modal-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--brown-sugar-mid);
+      max-width: 44ch;
+    }
+
+    .rules-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      text-align: left;
+    }
+
+    .rule-item {
+      background: var(--cream-bg);
+      border: 2px solid var(--brown-sugar);
+      border-radius: 14px;
+      padding: 10px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .rule-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--brown-sugar);
+    }
+
+    .rule-desc {
+      margin: 0;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: var(--brown-sugar-mid);
+    }
+
+    .controls-guide {
+      width: 100%;
+      background: #f9eedc;
+      border: 2px dashed var(--milk-tea-dark);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--brown-sugar);
+      line-height: 1.5;
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 1px 7px;
+      border: 2px solid var(--brown-sugar);
+      border-radius: 7px;
+      background: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 800;
+      box-shadow: 0 2px 0 var(--brown-sugar);
+      margin: 0 2px;
+    }
+
+    .result-banner {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 2px solid var(--brown-sugar);
+      font-weight: 800;
+      font-size: 0.96rem;
+    }
+
+    .result-banner.win {
+      background: var(--success-bg);
+      color: #265936;
+    }
+
+    .result-banner.lose {
+      background: var(--danger-bg);
+      color: #8f2d23;
+    }
+
+    .summary-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .summary-cell {
+      background: var(--cream-bg);
+      border: 2px solid var(--brown-sugar);
+      border-radius: 14px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .summary-num {
+      font-size: 1.3rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: var(--brown-sugar);
+    }
+
+    .summary-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--brown-sugar-mid);
+    }
+
+    .actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .primary-btn {
+      min-height: 46px;
+      padding: 11px 28px;
+      border: 3px solid var(--brown-sugar);
+      border-radius: 16px;
+      background: var(--caramel);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      box-shadow: 0 5px 0 var(--brown-sugar);
+      transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .primary-btn:hover {
+      background: var(--caramel-hover);
+    }
+
+    .primary-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 var(--brown-sugar);
+    }
+
+    .secondary-btn {
+      min-height: 46px;
+      padding: 10px 18px;
+      border: 2.5px solid var(--brown-sugar);
+      border-radius: 16px;
+      background: var(--cream-card);
+      color: var(--brown-sugar);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--brown-sugar);
+      transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .secondary-btn:hover {
+      background: #fff1dc;
+    }
+
+    .secondary-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--brown-sugar);
+    }
+
+    /* 底部操作微提示 */
+    .footer-hint {
+      flex-shrink: 0;
+      background: #f9e8d2;
+      border-top: 2px solid var(--brown-sugar);
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--brown-sugar-mid);
+    }
+
+    @media (max-width: 620px) {
       body {
-        margin: 0;
-        background: #f7ecdd;
-        color: #493025;
-        font: 16px/1.6 system-ui, -apple-system, "Microsoft JhengHei", sans-serif
+        padding: 6px;
       }
 
-      main {
-        max-width: 760px;
-        margin: auto;
-        padding: 30px 20px 24px
+      .game-shell {
+        height: 96dvh;
+        border-radius: 20px;
       }
 
-      header {
-        text-align: center;
-        margin-bottom: 20px
+      .hud-header {
+        padding: 8px 10px;
       }
 
-      .kicker {
-        font-size: 12px;
-        letter-spacing: 3px;
-        font-weight: 800;
-        color: #88664b
+      .hud-stats {
+        gap: 6px;
       }
 
-      h1 {
-        font-size: clamp(26px, 5vw, 43px);
-        line-height: 1.25;
-        margin: 10px 0
+      .stat-box {
+        padding: 5px 8px;
+        min-height: 38px;
       }
 
-      p {
-        margin: 8px 0
+      .stat-label {
+        font-size: 0.72rem;
       }
 
-      .game {
-        background: #fffaf1;
-        border: 1px solid #dec5a8;
-        border-radius: 24px;
-        padding: clamp(12px, 3vw, 24px);
-        box-shadow: 0 8px 0 #dcc3a5
+      .stat-value {
+        font-size: 0.94rem;
       }
 
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-bottom: 12px
+      .heart-icon {
+        width: 15px;
+        height: 15px;
       }
 
-      .stat {
-        background: #f0e1ce;
-        border-radius: 12px;
-        padding: 8px;
-        text-align: center
+      .modal-card {
+        padding: 16px 14px;
+        gap: 11px;
       }
 
-      .stat small {
-        display: block;
-        font-size: 12px;
-        color: #795b43
+      .rules-grid {
+        grid-template-columns: 1fr;
+        gap: 7px;
       }
 
-      .stat strong {
-        font-size: clamp(18px, 4vw, 27px);
-        font-variant-numeric: tabular-nums
+      .rule-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
       }
 
-      canvas {
-        width: 100%;
-        display: block;
-        background: #fbefd9;
-        border: 1px solid #dec5a8;
-        border-radius: 14px;
-        touch-action: none
-      }
-
-      .controls {
-        display: grid;
-        grid-template-columns: 1fr 2fr 1fr;
-        gap: 10px;
-        margin-top: 12px
-      }
-
-      button {
-        font: inherit;
-        font-weight: 750;
-        border: 0;
-        border-radius: 12px;
-        padding: 12px 8px;
-        background: #e9d6bb;
-        color: #493025;
-        cursor: pointer;
-        touch-action: none
-      }
-
-      button#start {
-        background: #70472f;
-        color: #fffaf1
-      }
-
-      button:focus-visible {
-        outline: 3px solid #a06a40;
-        outline-offset: 3px
-      }
-
-      button:active {
-        transform: translateY(2px)
-      }
-
-      #message {
-        text-align: center;
-        min-height: 28px;
-        font-weight: 700;
-        margin: 12px 0 0
-      }
-
-      .rules {
-        display: flex;
+      .footer-hint {
         justify-content: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        font-size: 14px;
-        margin: 24px 0 6px
-      }
-
-      .rules span {
-        background: #fffaf1;
-        border: 1px solid #dec5a8;
-        border-radius: 30px;
-        padding: 6px 12px
-      }
-
-      .hint,
-      footer {
         text-align: center;
-        color: #795b43;
-        font-size: 13px
       }
 
-      footer {
-        margin-top: 24px
+      .footer-extra {
+        display: none;
       }
+    }
 
-      .pearl {
-        display: inline-block;
-        width: 13px;
-        height: 13px;
-        background: #493025;
-        border-radius: 50%;
-        vertical-align: middle;
-        margin-right: 5px
+    @media (prefers-reduced-motion: reduce) {
+      .timer-bar-fill,
+      .sound-btn,
+      .primary-btn,
+      .secondary-btn {
+        transition: none;
       }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <div class="kicker">TFG · VIBE CODING · MINI GAME 01</div>
-        <h1>🧋 老師的手搖飲不能不加。珍。珠 🧋 </h1>
-        <p>沒有珍珠的手搖飲，怎麼可以呢？</p>
-        <p>被稀釋的手搖飲，也是不行的呢！</p>
-      </header>
-      <section class="game" aria-label="珍珠接接樂">
-        <div class="stats">
-          <div class="stat">
-            <small>分數</small>
-            <strong id="score">0</strong>
-          </div>
-          <div class="stat">
-            <small>剩餘時間</small>
-            <strong id="time">30 秒</strong>
-          </div>
-          <div class="stat">
-            <small>生命值</small>
-            <strong id="lives">♥♥♥</strong>
-          </div>
-        </div>
-        <canvas id="game" width="420" height="265" aria-label="手搖飲珍珠接取遊戲"></canvas>
-        <p id="message" aria-live="polite">接住黑糖珍珠，避開冰塊！</p>
-        <div class="controls">
-          <button id="left" aria-label="左移">←</button>
-          <button id="start">開始遊戲</button>
-          <button id="right" aria-label="右移">→</button>
-        </div>
-      </section>
-      <div class="rules">
-        <span>
-          <i class="pearl"></i> 珍珠 +10 分 </span>
-        <span>🧊 冰塊 −1 生命</span>
-        <span>⏱ 30 秒挑戰</span>
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell" aria-label="老師的手搖飲不能不加珍珠遊戲視窗">
+    <header class="hud-header">
+      <div class="hud-top-row">
+        <h1 class="brand-title">
+          <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M18 3 L20 10" stroke="#462819" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M9 10 L23 10 L20.8 27 C20.6 28.2 19.6 29 18.4 29 L13.6 29 C12.4 29 11.4 28.2 11.2 27 Z" fill="#E8C094" stroke="#462819" stroke-width="2.3" stroke-linejoin="round"/>
+            <path d="M7.5 10 L24.5 10" stroke="#462819" stroke-width="2.6" stroke-linecap="round"/>
+            <circle cx="13.5" cy="24.5" r="2.2" fill="#462819"/>
+            <circle cx="18.2" cy="24.5" r="2.2" fill="#462819"/>
+            <circle cx="16" cy="21.5" r="2" fill="#462819"/>
+          </svg>
+          <span>老師的手搖飲不能不加珍珠！</span>
+        </h1>
+        <button id="soundToggleBtn" class="sound-btn" type="button" aria-pressed="true">
+          <span id="soundIcon" aria-hidden="true">🔊</span>
+          <span id="soundLabel">音效：開</span>
+        </button>
       </div>
-      <p class="hint">使用左右方向鍵、下方按鈕或拖曳杯子。存活到時間結束，並至少接到一顆珍珠，就成功啦！</p>
-      <footer>我的第一個vibe coding遊戲</footer>
-    </main>
-    <script>
+
+      <div class="hud-stats">
+        <div class="stat-box" aria-live="polite">
+          <span class="stat-label">分數</span>
+          <span class="stat-value"><span id="scoreValue">0</span> 分</span>
+        </div>
+
+        <div id="timerBox" class="stat-box timer-box" aria-live="polite">
+          <div class="timer-top">
+            <span class="stat-label">剩餘時間</span>
+            <span class="stat-value"><span id="timeValue">30</span> 秒</span>
+          </div>
+          <div class="timer-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="30" aria-valuenow="30" id="timeProgress">
+            <div class="timer-bar-fill" id="timeBarFill"></div>
+          </div>
+        </div>
+
+        <div class="stat-box" aria-live="polite">
+          <span class="stat-label">生命 <span id="livesCountText">3/3</span></span>
+          <span class="hearts-wrap" id="heartsWrap" aria-label="生命值 3 點">
+            <svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5 C12 20.5 4 14.8 4 8.8 C4 6.1 6.1 4 8.7 4 C10.3 4 11.4 4.8 12 5.9 C12.6 4.8 13.7 4 15.3 4 C17.9 4 20 6.1 20 8.8 C20 14.8 12 20.5 12 20.5 Z" fill="#D9534F" stroke="#462819" stroke-width="2" stroke-linejoin="round"/></svg>
+            <svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5 C12 20.5 4 14.8 4 8.8 C4 6.1 6.1 4 8.7 4 C10.3 4 11.4 4.8 12 5.9 C12.6 4.8 13.7 4 15.3 4 C17.9 4 20 6.1 20 8.8 C20 14.8 12 20.5 12 20.5 Z" fill="#D9534F" stroke="#462819" stroke-width="2" stroke-linejoin="round"/></svg>
+            <svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5 C12 20.5 4 14.8 4 8.8 C4 6.1 6.1 4 8.7 4 C10.3 4 11.4 4.8 12 5.9 C12.6 4.8 13.7 4 15.3 4 C17.9 4 20 6.1 20 8.8 C20 14.8 12 20.5 12 20.5 Z" fill="#D9534F" stroke="#462819" stroke-width="2" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <section class="stage-wrap" id="stageWrap">
+      <canvas id="gameCanvas" aria-label="遊戲互動區：控制手搖飲杯接取珍珠、躲避冰塊"></canvas>
+      <div id="hurtFlash" class="hurt-flash" aria-hidden="true"></div>
+      <div id="speedToast" class="speed-toast" aria-live="polite">珍珠掉落速度加快囉！</div>
+
+      <!-- 標題開始畫面 -->
+      <div id="startOverlay" class="overlay">
+        <div class="modal-card">
+          <svg class="mascot-badge" viewBox="0 0 110 110" aria-hidden="true">
+            <circle cx="55" cy="56" r="46" fill="#F9E8D2" stroke="#462819" stroke-width="3"/>
+            <path d="M62 12 L56 36" stroke="#D97224" stroke-width="6.5" stroke-linecap="round"/>
+            <path d="M62 12 L56 36" stroke="#462819" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M32 36 L78 36 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#FBF5EB" stroke="#462819" stroke-width="3.2" stroke-linejoin="round"/>
+            <path d="M35.2 48 Q45 44 55 48 T74.8 48 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#D8A373"/>
+            <path d="M28 36 L82 36" stroke="#462819" stroke-width="3.6" stroke-linecap="round"/>
+            <!-- 可愛表情 -->
+            <circle cx="46.5" cy="60" r="2.6" fill="#462819"/>
+            <circle cx="63.5" cy="60" r="2.6" fill="#462819"/>
+            <circle cx="42" cy="64" r="3" fill="#F29E8E" opacity="0.75"/>
+            <circle cx="68" cy="64" r="3" fill="#F29E8E" opacity="0.75"/>
+            <path d="M51 63 Q55 67.5 59 63" fill="none" stroke="#462819" stroke-width="2.4" stroke-linecap="round"/>
+            <!-- 杯底珍珠 -->
+            <circle cx="46" cy="82" r="4.5" fill="#462819"/>
+            <circle cx="55" cy="83.5" r="4.5" fill="#361D11"/>
+            <circle cx="64" cy="82" r="4.5" fill="#462819"/>
+            <circle cx="50.5" cy="75.5" r="4.2" fill="#462819"/>
+            <circle cx="60" cy="76" r="4.2" fill="#361D11"/>
+            <circle cx="44.8" cy="80.8" r="1.2" fill="#FFF8EE"/>
+            <circle cx="53.8" cy="82.2" r="1.2" fill="#FFF8EE"/>
+            <circle cx="62.8" cy="80.8" r="1.2" fill="#FFF8EE"/>
+          </svg>
+
+          <div>
+            <h2 class="modal-title">老師的手搖飲不能不加珍珠！</h2>
+            <p class="modal-subtitle">老師想喝一杯香濃的黑糖珍珠奶茶，快用 30 秒幫忙接住滿滿珍珠，別讓多餘的冰塊掉進杯子裡！</p>
+          </div>
+
+          <div class="rules-grid">
+            <div class="rule-item">
+              <div class="rule-head">
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" fill="#462819" stroke="#2D170D" stroke-width="2"/>
+                  <circle cx="9" cy="9" r="2.2" fill="#FFF8EE"/>
+                </svg>
+                <span>接黑糖珍珠</span>
+              </div>
+              <p class="rule-desc">每顆 <strong>+10 分</strong>，努力加滿珍珠！</p>
+            </div>
+
+            <div class="rule-item">
+              <div class="rule-head">
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="4" y="4" width="16" height="16" rx="4" fill="#BCE7F8" stroke="#462819" stroke-width="2"/>
+                  <path d="M8 9 L12 7 M9 15 L15 11" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>避開冰塊</span>
+              </div>
+              <p class="rule-desc">接到冰塊會 <strong>扣 1 點生命</strong>（共 3 點）。</p>
+            </div>
+
+            <div class="rule-item">
+              <div class="rule-head">
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="13" r="8" fill="#F9E8D2" stroke="#462819" stroke-width="2"/>
+                  <path d="M12 9 V13 L15 15 M9 3 H15" stroke="#462819" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>30 秒過關</span>
+              </div>
+              <p class="rule-desc">結束時保有生命且 <strong>至少 1 顆珍珠</strong> 即成功！</p>
+            </div>
+          </div>
+
+          <div class="controls-guide">
+            操作方式：按鍵盤 <span class="kbd">←</span> <span class="kbd">→</span> 方向鍵，或直接用 <strong>滑鼠／手指左右拖曳</strong> 手搖飲杯！
+          </div>
+
+          <div class="actions-row">
+            <button id="startBtn" class="primary-btn" type="button">開始遊戲</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 結束結果畫面 -->
+      <div id="resultOverlay" class="overlay hidden">
+        <div class="modal-card">
+          <div id="resultMascotWrap" class="mascot-badge" aria-hidden="true"></div>
+
+          <div>
+            <h2 id="resultTitle" class="modal-title">遊戲結束</h2>
+            <p id="resultMessage" class="modal-subtitle"></p>
+          </div>
+
+          <div id="resultBanner" class="result-banner win"></div>
+
+          <div class="summary-grid">
+            <div class="summary-cell">
+              <span id="finalScore" class="summary-num">0</span>
+              <span class="summary-label">總得分</span>
+            </div>
+            <div class="summary-cell">
+              <span id="finalPearls" class="summary-num">0 顆</span>
+              <span class="summary-label">接到珍珠</span>
+            </div>
+            <div class="summary-cell">
+              <span id="finalLives" class="summary-num">3 / 3</span>
+              <span class="summary-label">剩餘生命</span>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button id="restartBtn" class="primary-btn" type="button">再玩一次</button>
+            <button id="backHomeBtn" class="secondary-btn" type="button">查看說明</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer-hint">
+      <span>操作提示：鍵盤左右方向鍵（← / →）或滑鼠、觸控左右拖曳移動杯子</span>
+      <span class="footer-extra" id="pearlStatusHint">目前收集：0 顆珍珠</span>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
       'use strict';
-      const $ = id => document.getElementById(id);
-      const cv = $('game'),
-        ctx = cv.getContext('2d');
-      let x = 210,
-        items = [],
-        score = 0,
-        lives = 3,
-        active = false,
-        start = 0,
-        last = 0,
-        spawn = 0,
-        raf = 0,
-        keys = {},
-        remain = 30,
-        played = false;
 
-      function stats() {
-        $('score').textContent = score;
-        $('time').textContent = Math.ceil(remain) + ' 秒';
-        $('lives').textContent = '♥'.repeat(Math.max(0, lives)) || '0';
-        $('lives').setAttribute('aria-label', Math.max(0, lives) + ' 點生命值')
-      }
+      const GAME_DURATION = 30;
+      const INITIAL_LIVES = 3;
+      const PEARL_POINTS = 10;
 
-      function draw() {
-        ctx.clearRect(0, 0, 420, 265);
-        ctx.fillStyle = '#d7b999';
-        ctx.fillRect(0, 244, 420, 21);
-        ctx.textAlign = 'center';
-        ctx.font = '25px sans-serif';
-        items.forEach(o => {
-          if (o.good) {
-            ctx.beginPath();
-            ctx.arc(o.x, o.y - 9, 10, 0, Math.PI * 2);
-            ctx.fillStyle = '#493025';
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(o.x - 3, o.y - 12, 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#96735b';
-            ctx.fill()
-          } else {
-            ctx.fillText('🧊', o.x, o.y)
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const stageWrap = document.getElementById('stageWrap');
+
+      const scoreEl = document.getElementById('scoreValue');
+      const timeEl = document.getElementById('timeValue');
+      const timeBarFill = document.getElementById('timeBarFill');
+      const timeProgress = document.getElementById('timeProgress');
+      const timerBox = document.getElementById('timerBox');
+      const heartsWrap = document.getElementById('heartsWrap');
+      const livesCountText = document.getElementById('livesCountText');
+      const pearlStatusHint = document.getElementById('pearlStatusHint');
+      const hurtFlash = document.getElementById('hurtFlash');
+      const speedToast = document.getElementById('speedToast');
+
+      const startOverlay = document.getElementById('startOverlay');
+      const resultOverlay = document.getElementById('resultOverlay');
+      const startBtn = document.getElementById('startBtn');
+      const restartBtn = document.getElementById('restartBtn');
+      const backHomeBtn = document.getElementById('backHomeBtn');
+      const soundToggleBtn = document.getElementById('soundToggleBtn');
+      const soundIcon = document.getElementById('soundIcon');
+      const soundLabel = document.getElementById('soundLabel');
+
+      const resultTitle = document.getElementById('resultTitle');
+      const resultMessage = document.getElementById('resultMessage');
+      const resultBanner = document.getElementById('resultBanner');
+      const resultMascotWrap = document.getElementById('resultMascotWrap');
+      const finalScore = document.getElementById('finalScore');
+      const finalPearls = document.getElementById('finalPearls');
+      const finalLives = document.getElementById('finalLives');
+
+      // 音效合成引擎（純 Web Audio API，不依賴任何外部音訊檔）
+      const audioEngine = {
+        enabled: true,
+        ctx: null,
+        ensureCtx() {
+          if (!this.enabled) return null;
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            this.ctx = new AudioCtx();
           }
-        });
-        ctx.font = '38px sans-serif';
-        ctx.fillText('🧋', x, 243);
-        if (!active && !played) {
-          ctx.font = '15px sans-serif';
-          ctx.fillStyle = '#654c39';
-          ctx.fillText('準備好接住珍珠了嗎？', 210, 110)
-        }
-      }
-
-      function move(d) {
-        x = Math.max(23, Math.min(397, x + d));
-      }
-
-      function tick(t) {
-        if (!active) return;
-        const dt = Math.min((t - last) / 1000, .05);
-        last = t;
-        remain = Math.max(0, 30 - (t - start) / 1000);
-        if (remain <= 0) {
-          finish();
-          return
-        }
-        move(((keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0)) * 280 * dt);
-        if (t - spawn > 560) {
-          items.push({
-            x: 24 + Math.random() * 372,
-            y: -15,
-            good: Math.random() > .3,
-            v: 85 + Math.random() * 55 + (30 - remain) * 3
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(function () {});
+          }
+          return this.ctx;
+        },
+        playPearl() {
+          const ac = this.ensureCtx();
+          if (!ac) return;
+          const now = ac.currentTime;
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+          osc.frequency.exponentialRampToValueAtTime(1046, now + 0.14);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.16, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(now);
+          osc.stop(now + 0.19);
+        },
+        playIce() {
+          const ac = this.ensureCtx();
+          if (!ac) return;
+          const now = ac.currentTime;
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 0.22);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.22, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(now);
+          osc.stop(now + 0.26);
+        },
+        playWin() {
+          const ac = this.ensureCtx();
+          if (!ac) return;
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          const now = ac.currentTime;
+          notes.forEach(function (freq, idx) {
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            const t = now + idx * 0.09;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.linearRampToValueAtTime(0.14, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.start(t);
+            osc.stop(t + 0.3);
           });
-          spawn = t
+        },
+        playLose() {
+          const ac = this.ensureCtx();
+          if (!ac) return;
+          const notes = [392, 349.23, 293.66];
+          const now = ac.currentTime;
+          notes.forEach(function (freq, idx) {
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            const t = now + idx * 0.14;
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.linearRampToValueAtTime(0.14, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.start(t);
+            osc.stop(t + 0.28);
+          });
         }
-        items = items.filter(o => {
-          o.y += o.v * dt;
-          if (lives > 0 && o.y > 213 && o.y < 249 && Math.abs(o.x - x) < 30) {
-            if (o.good) score += 10;
-            else lives--;
-            return false
-          }
-          return o.y < 285
-        });
-        stats();
-        draw();
-        if (lives <= 0) {
-          finish();
-          return
-        }
-        raf = requestAnimationFrame(tick)
-      }
-
-      function finish() {
-        active = false;
-        keys = {};
-        stats();
-        draw();
-        $('message').textContent = (lives <= 0 ? '冰塊太多啦！' : score > 0 ? '珍珠手搖飲完成啦！' : '沒有珍珠怎麼可以！') + ' 最終 ' + score + ' 分';
-        $('start').textContent = '再玩一次'
-      }
-      $('start').onclick = () => {
-        cancelAnimationFrame(raf);
-        x = 210;
-        items = [];
-        score = 0;
-        lives = 3;
-        remain = 30;
-        keys = {};
-        active = true;
-        played = true;
-        start = last = spawn = performance.now();
-        $('message').textContent = '接住珍珠，避開冰塊！';
-        $('start').textContent = '重新開始';
-        stats();
-        draw();
-        raf = requestAnimationFrame(tick)
       };
-      window.addEventListener('keydown', e => {
-        if (active && ['ArrowLeft', 'ArrowRight'].includes(e.key)) {
-          e.preventDefault();
-          keys[e.key] = true
+
+      const state = {
+        phase: 'TITLE_MENU', // TITLE_MENU | PLAYING | GAME_OVER
+        width: 720,
+        height: 480,
+        score: 0,
+        pearlsCollected: 0,
+        lives: INITIAL_LIVES,
+        timeRemaining: GAME_DURATION,
+        elapsed: 0,
+        spawnTimer: 0,
+        speedMilestone: 0,
+        toastTimer: 0,
+        hurtFlashTimer: 0,
+        rafId: null,
+        lastTs: 0,
+        keys: { left: false, right: false },
+        dragging: false,
+        dragOffsetX: 0,
+        cup: {
+          x: 360,
+          y: 390,
+          vx: 0,
+          topWidth: 96,
+          bottomWidth: 68,
+          height: 102,
+          mood: 'normal', // normal | happy | hurt
+          moodTimer: 0,
+          shakeTimer: 0,
+          liquidTilt: 0,
+          wavePhase: 0,
+          collectedVisuals: []
+        },
+        items: [],
+        particles: [],
+        floatingTexts: []
+      };
+
+      function resizeCanvas() {
+        const rect = stageWrap.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = Math.max(300, Math.floor(rect.width));
+        const h = Math.max(260, Math.floor(rect.height));
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const prevWidth = state.width || w;
+        const ratio = w / prevWidth;
+        state.width = w;
+        state.height = h;
+
+        const cupScale = Math.max(0.84, Math.min(1.08, w / 680));
+        state.cup.topWidth = Math.round(98 * cupScale);
+        state.cup.bottomWidth = Math.round(68 * cupScale);
+        state.cup.height = Math.round(104 * cupScale);
+        state.cup.y = h - state.cup.height * 0.5 - 24;
+        state.cup.x = clampCupX(state.cup.x * ratio);
+      }
+
+      function clampCupX(x) {
+        const half = state.cup.topWidth * 0.5 + 12;
+        return Math.max(half, Math.min(state.width - half, x));
+      }
+
+      function updateHUD() {
+        scoreEl.textContent = String(state.score);
+        const secs = Math.max(0, Math.ceil(state.timeRemaining));
+        timeEl.textContent = String(secs);
+        const pct = Math.max(0, Math.min(100, (state.timeRemaining / GAME_DURATION) * 100));
+        timeBarFill.style.width = pct.toFixed(1) + '%';
+        timeProgress.setAttribute('aria-valuenow', String(secs));
+
+        if (state.phase === 'PLAYING' && state.timeRemaining <= 6) {
+          timerBox.classList.add('timer-urgent');
+        } else {
+          timerBox.classList.remove('timer-urgent');
+        }
+
+        livesCountText.textContent = state.lives + '/' + INITIAL_LIVES;
+        heartsWrap.setAttribute('aria-label', '生命值 ' + state.lives + ' 點');
+        const heartEls = heartsWrap.querySelectorAll('.heart-icon');
+        heartEls.forEach(function (el, index) {
+          if (index < state.lives) {
+            el.classList.remove('heart-lost');
+          } else {
+            el.classList.add('heart-lost');
+          }
+        });
+
+        pearlStatusHint.textContent = '目前收集：' + state.pearlsCollected + ' 顆珍珠';
+      }
+
+      function showSpeedToast(message) {
+        speedToast.textContent = message;
+        speedToast.classList.add('visible');
+        state.toastTimer = 2.0;
+      }
+
+      function hideSpeedToast() {
+        speedToast.classList.remove('visible');
+        state.toastTimer = 0;
+      }
+
+      function resetGameState() {
+        state.score = 0;
+        state.pearlsCollected = 0;
+        state.lives = INITIAL_LIVES;
+        state.timeRemaining = GAME_DURATION;
+        state.elapsed = 0;
+        state.spawnTimer = 0.25;
+        state.speedMilestone = 0;
+        state.hurtFlashTimer = 0;
+        hurtFlash.classList.remove('active');
+        hideSpeedToast();
+
+        state.items = [];
+        state.particles = [];
+        state.floatingTexts = [];
+        state.keys.left = false;
+        state.keys.right = false;
+        state.dragging = false;
+
+        state.cup.x = state.width * 0.5;
+        state.cup.vx = 0;
+        state.cup.mood = 'normal';
+        state.cup.moodTimer = 0;
+        state.cup.shakeTimer = 0;
+        state.cup.liquidTilt = 0;
+        state.cup.collectedVisuals = [];
+
+        updateHUD();
+      }
+
+      function startGame() {
+        audioEngine.ensureCtx();
+        resetGameState();
+        state.phase = 'PLAYING';
+        startOverlay.classList.add('hidden');
+        resultOverlay.classList.add('hidden');
+        state.lastTs = performance.now();
+      }
+
+      function createResultMascotSVG(kind) {
+        if (kind === 'win') {
+          return '<svg viewBox="0 0 110 110" width="92" height="92"><circle cx="55" cy="56" r="46" fill="#EAF6ED" stroke="#462819" stroke-width="3"/><path d="M62 12 L56 36" stroke="#D97224" stroke-width="6.5" stroke-linecap="round"/><path d="M32 36 L78 36 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#FBF5EB" stroke="#462819" stroke-width="3.2" stroke-linejoin="round"/><path d="M35.2 48 Q45 44 55 48 T74.8 48 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#D8A373"/><path d="M28 36 L82 36" stroke="#462819" stroke-width="3.6" stroke-linecap="round"/><path d="M43 59 Q46.5 55 50 59 M60 59 Q63.5 55 67 59" fill="none" stroke="#462819" stroke-width="2.6" stroke-linecap="round"/><path d="M49 64 Q55 70 61 64" fill="none" stroke="#462819" stroke-width="2.6" stroke-linecap="round"/><circle cx="46" cy="82" r="4.5" fill="#462819"/><circle cx="55" cy="83.5" r="4.5" fill="#361D11"/><circle cx="64" cy="82" r="4.5" fill="#462819"/><circle cx="50" cy="75" r="4.3" fill="#462819"/><circle cx="60" cy="75" r="4.3" fill="#361D11"/></svg>';
+        }
+        if (kind === 'ice') {
+          return '<svg viewBox="0 0 110 110" width="92" height="92"><circle cx="55" cy="56" r="46" fill="#E7F6FC" stroke="#462819" stroke-width="3"/><path d="M32 36 L78 36 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#FBF5EB" stroke="#462819" stroke-width="3.2" stroke-linejoin="round"/><path d="M35.5 52 L74.5 52 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#BCE7F8"/><path d="M28 36 L82 36" stroke="#462819" stroke-width="3.6" stroke-linecap="round"/><path d="M43 58 L49 61 L43 64 M67 58 L61 61 L67 64" fill="none" stroke="#462819" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M49 69 Q55 65 61 69" fill="none" stroke="#462819" stroke-width="2.4" stroke-linecap="round"/><rect x="42" y="72" width="11" height="11" rx="2.5" fill="#FFFFFF" stroke="#462819" stroke-width="2"/><rect x="57" y="74" width="10" height="10" rx="2.5" fill="#FFFFFF" stroke="#462819" stroke-width="2"/></svg>';
+        }
+        return '<svg viewBox="0 0 110 110" width="92" height="92"><circle cx="55" cy="56" r="46" fill="#FDEBE8" stroke="#462819" stroke-width="3"/><path d="M32 36 L78 36 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#FBF5EB" stroke="#462819" stroke-width="3.2" stroke-linejoin="round"/><path d="M35.2 48 Q45 45 55 48 T74.8 48 L71 84 C70.5 87.5 67.5 90 64 90 L46 90 C42.5 90 39.5 87.5 39 84 Z" fill="#D8A373"/><path d="M28 36 L82 36" stroke="#462819" stroke-width="3.6" stroke-linecap="round"/><circle cx="46" cy="60" r="2.4" fill="#462819"/><circle cx="64" cy="60" r="2.4" fill="#462819"/><path d="M49 69 Q55 64 61 69" fill="none" stroke="#462819" stroke-width="2.4" stroke-linecap="round"/></svg>';
+      }
+
+      function finishGame(reason) {
+        state.phase = 'GAME_OVER';
+        state.keys.left = false;
+        state.keys.right = false;
+        state.dragging = false;
+        hideSpeedToast();
+
+        const isWin = state.lives > 0 && state.pearlsCollected >= 1 && reason === 'TIME_UP';
+
+        finalScore.textContent = state.score + ' 分';
+        finalPearls.textContent = state.pearlsCollected + ' 顆';
+        finalLives.textContent = state.lives + ' / ' + INITIAL_LIVES;
+
+        if (isWin) {
+          audioEngine.playWin();
+          resultMascotWrap.innerHTML = createResultMascotSVG('win');
+          resultTitle.textContent = '挑戰成功！';
+          resultBanner.className = 'result-banner win';
+          if (state.pearlsCollected >= 18) {
+            resultBanner.textContent = '特級波霸加滿滿，老師喝得超開心！';
+            resultMessage.textContent = '手眼協調一百分！滿滿黑糖珍珠配上香醇奶茶，這杯絕對是老師的最愛。';
+          } else if (state.pearlsCollected >= 8) {
+            resultBanner.textContent = '黃金比例珍珠奶茶完成！';
+            resultMessage.textContent = '時間內穩穩接住香甜珍珠又成功閃過多餘冰塊，老師讚不絕口！';
+          } else {
+            resultBanner.textContent = '成功保住珍珠，過關啦！';
+            resultMessage.textContent = '雖然還可以再多加一點珍珠，但有珍珠的奶茶就是好喝！再挑戰更高分吧！';
+          }
+        } else if (state.lives <= 0) {
+          audioEngine.playLose();
+          resultMascotWrap.innerHTML = createResultMascotSVG('ice');
+          resultTitle.textContent = '挑戰失敗！';
+          resultBanner.className = 'result-banner lose';
+          resultBanner.textContent = '冰塊太多了，手搖飲變成冰塊水！';
+          resultMessage.textContent = '生命值歸零囉！下次看到亮藍色的方形冰塊記得迅速閃開，只接深色圓圓的珍珠。';
+        } else {
+          audioEngine.playLose();
+          resultMascotWrap.innerHTML = createResultMascotSVG('empty');
+          resultTitle.textContent = '挑戰失敗！';
+          resultBanner.className = 'result-banner lose';
+          resultBanner.textContent = '時間到了卻一顆珍珠都沒有！';
+          resultMessage.textContent = '沒有珍珠的手搖飲讓老師好難過，再試一次幫老師接住至少一顆珍珠吧！';
+        }
+
+        updateHUD();
+        resultOverlay.classList.remove('hidden');
+      }
+
+      function spawnItem() {
+        const progress = Math.min(1, state.elapsed / GAME_DURATION);
+        // 隨著時間推進，物品掉落速度逐漸加快
+        const baseSpeed = 165 + progress * 185;
+        const speedJitter = (Math.random() - 0.5) * 38;
+
+        // 冰塊比例從 30% 微幅上升到 44%，維持初學者友善體驗
+        const iceChance = 0.30 + progress * 0.14;
+        const type = Math.random() < iceChance ? 'ice' : 'pearl';
+
+        const radius = type === 'pearl' ? 15 : 18;
+        const margin = radius + 18;
+        const x = margin + Math.random() * Math.max(20, state.width - margin * 2);
+
+        state.items.push({
+          type: type,
+          x: x,
+          y: -radius - 10,
+          radius: radius,
+          vy: baseSpeed + speedJitter,
+          vx: (Math.random() - 0.5) * 24,
+          rot: Math.random() * Math.PI * 2,
+          vRot: (Math.random() - 0.5) * (type === 'ice' ? 2.4 : 1.1),
+          swaySeed: Math.random() * Math.PI * 2
+        });
+      }
+
+      function addFloatingText(x, y, text, color) {
+        state.floatingTexts.push({
+          x: x,
+          y: y,
+          text: text,
+          color: color,
+          life: 0.95,
+          maxLife: 0.95
+        });
+      }
+
+      function addParticles(x, y, color, count, isSquare) {
+        for (let i = 0; i < count; i++) {
+          const angle = -Math.PI * 0.15 - Math.random() * Math.PI * 0.7;
+          const speed = 70 + Math.random() * 140;
+          state.particles.push({
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 40,
+            vy: Math.sin(angle) * speed,
+            size: 3 + Math.random() * 4,
+            color: color,
+            square: !!isSquare,
+            life: 0.55 + Math.random() * 0.25,
+            maxLife: 0.8
+          });
+        }
+      }
+
+      function addCupPearlVisual() {
+        if (state.cup.collectedVisuals.length >= 24) return;
+        const idx = state.cup.collectedVisuals.length;
+        const row = Math.floor(idx / 5);
+        const col = idx % 5;
+        const spread = (col - 2) * 11 + (row % 2 === 0 ? -3 : 3) + (Math.random() - 0.5) * 4;
+        const offsetY = 12 + row * 9.5 + (Math.random() - 0.5) * 2.5;
+        state.cup.collectedVisuals.push({
+          dx: spread,
+          dy: offsetY,
+          r: 5.5 + Math.random() * 1.2
+        });
+      }
+
+      function update(dt) {
+        state.cup.wavePhase += dt * 4.2;
+
+        if (state.phase !== 'PLAYING') {
+          return;
+        }
+
+        state.elapsed += dt;
+        state.timeRemaining = Math.max(0, GAME_DURATION - state.elapsed);
+
+        if (state.elapsed >= 10 && state.speedMilestone < 1) {
+          state.speedMilestone = 1;
+          showSpeedToast('掉落速度加快囉！');
+        } else if (state.elapsed >= 20 && state.speedMilestone < 2) {
+          state.speedMilestone = 2;
+          showSpeedToast('最後衝刺！珍珠加速掉落中！');
+        }
+
+        if (state.toastTimer > 0) {
+          state.toastTimer -= dt;
+          if (state.toastTimer <= 0) {
+            hideSpeedToast();
+          }
+        }
+
+        if (state.hurtFlashTimer > 0) {
+          state.hurtFlashTimer -= dt;
+          if (state.hurtFlashTimer <= 0) {
+            hurtFlash.classList.remove('active');
+          }
+        }
+
+        if (state.cup.moodTimer > 0) {
+          state.cup.moodTimer -= dt;
+          if (state.cup.moodTimer <= 0) {
+            state.cup.mood = 'normal';
+          }
+        }
+
+        if (state.cup.shakeTimer > 0) {
+          state.cup.shakeTimer -= dt;
+        }
+
+        // 鍵盤左右方向鍵移動
+        const moveDir = (state.keys.right ? 1 : 0) - (state.keys.left ? 1 : 0);
+        const maxKeyboardSpeed = Math.max(430, state.width * 0.72);
+        if (!state.dragging) {
+          if (moveDir !== 0) {
+            state.cup.vx = moveDir * maxKeyboardSpeed;
+          } else {
+            state.cup.vx *= Math.pow(0.001, dt);
+          }
+          state.cup.x = clampCupX(state.cup.x + state.cup.vx * dt);
+        }
+
+        // 奶茶液面隨移動速度晃動
+        const targetTilt = Math.max(-0.22, Math.min(0.22, -state.cup.vx * 0.00038));
+        state.cup.liquidTilt += (targetTilt - state.cup.liquidTilt) * Math.min(1, dt * 10);
+
+        // 生成掉落物品（隨時間稍微縮短間隔）
+        const progress = Math.min(1, state.elapsed / GAME_DURATION);
+        const spawnInterval = Math.max(0.32, 0.74 - progress * 0.36);
+        state.spawnTimer -= dt;
+        if (state.spawnTimer <= 0) {
+          spawnItem();
+          state.spawnTimer = spawnInterval * (0.85 + Math.random() * 0.3);
+        }
+
+        // 接取區域（杯口附近，設計友善且精準）
+        const cupTopY = state.cup.y - state.cup.height * 0.5;
+        const catchZoneTop = cupTopY - 6;
+        const catchZoneBottom = cupTopY + 28;
+        const catchHalfWidth = state.cup.topWidth * 0.5 + 8;
+
+        for (let i = state.items.length - 1; i >= 0; i--) {
+          const item = state.items[i];
+          item.y += item.vy * dt;
+          item.x += item.vx * dt + Math.sin(state.elapsed * 2.5 + item.swaySeed) * 14 * dt;
+          item.rot += item.vRot * dt;
+
+          // 邊界輕微反彈
+          if (item.x < item.radius + 8) {
+            item.x = item.radius + 8;
+            item.vx = Math.abs(item.vx);
+          } else if (item.x > state.width - item.radius - 8) {
+            item.x = state.width - item.radius - 8;
+            item.vx = -Math.abs(item.vx);
+          }
+
+          const hitX = Math.abs(item.x - state.cup.x) <= catchHalfWidth + item.radius * 0.35;
+          const hitY = item.y + item.radius * 0.55 >= catchZoneTop && item.y - item.radius * 0.4 <= catchZoneBottom;
+
+          if (hitX && hitY) {
+            if (item.type === 'pearl') {
+              state.score += PEARL_POINTS;
+              state.pearlsCollected += 1;
+              state.cup.mood = 'happy';
+              state.cup.moodTimer = 0.45;
+              addCupPearlVisual();
+              addFloatingText(item.x, cupTopY - 14, '+10', '#D97224');
+              addParticles(item.x, cupTopY, '#462819', 7, false);
+              addParticles(item.x, cupTopY, '#E8C094', 5, false);
+              audioEngine.playPearl();
+            } else {
+              state.lives = Math.max(0, state.lives - 1);
+              state.cup.mood = 'hurt';
+              state.cup.moodTimer = 0.6;
+              state.cup.shakeTimer = 0.35;
+              state.hurtFlashTimer = 0.25;
+              hurtFlash.classList.add('active');
+              addFloatingText(item.x, cupTopY - 16, '-1 生命！好冰！', '#C9483B');
+              addParticles(item.x, cupTopY, '#8ED5F0', 10, true);
+              audioEngine.playIce();
+            }
+            state.items.splice(i, 1);
+            updateHUD();
+
+            if (state.lives <= 0) {
+              finishGame('NO_LIVES');
+              return;
+            }
+            continue;
+          }
+
+          if (item.y - item.radius > state.height + 20) {
+            state.items.splice(i, 1);
+          }
+        }
+
+        // 更新粒子
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vy += 320 * dt;
+          p.life -= dt;
+          if (p.life <= 0) {
+            state.particles.splice(i, 1);
+          }
+        }
+
+        // 更新飄浮得分與扣血文字
+        for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+          const ft = state.floatingTexts[i];
+          ft.y -= 48 * dt;
+          ft.life -= dt;
+          if (ft.life <= 0) {
+            state.floatingTexts.splice(i, 1);
+          }
+        }
+
+        updateHUD();
+
+        if (state.timeRemaining <= 0) {
+          finishGame('TIME_UP');
+        }
+      }
+
+      function drawBackground() {
+        const w = state.width;
+        const h = state.height;
+
+        // 柔和手繪奶茶店上方雨棚波浪裝飾
+        const scallopW = 46;
+        const count = Math.ceil(w / scallopW) + 1;
+        for (let i = 0; i < count; i++) {
+          const sx = i * scallopW;
+          ctx.beginPath();
+          ctx.moveTo(sx, 0);
+          ctx.lineTo(sx + scallopW, 0);
+          ctx.lineTo(sx + scallopW, 18);
+          ctx.arc(sx + scallopW * 0.5, 18, scallopW * 0.5, 0, Math.PI, false);
+          ctx.closePath();
+          ctx.fillStyle = i % 2 === 0 ? '#E8C094' : '#FFFDF8';
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'rgba(70, 40, 25, 0.25)';
+          ctx.stroke();
+        }
+
+        // 遠景手繪小圓點裝飾
+        ctx.fillStyle = 'rgba(216, 163, 115, 0.14)';
+        for (let i = 0; i < 6; i++) {
+          const cx = ((i + 0.5) / 6) * w;
+          const cy = 95 + (i % 2) * 55;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 16 + (i % 3) * 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 木質吧台桌面
+        const counterY = h - 32;
+        ctx.fillStyle = '#E4B889';
+        ctx.fillRect(0, counterY, w, 32);
+
+        ctx.beginPath();
+        ctx.moveTo(0, counterY);
+        ctx.lineTo(w, counterY);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#462819';
+        ctx.stroke();
+
+        // 木紋手繪線條
+        ctx.strokeStyle = 'rgba(70, 40, 25, 0.2)';
+        ctx.lineWidth = 2;
+        for (let x = 24; x < w; x += 110) {
+          ctx.beginPath();
+          ctx.moveTo(x, counterY + 14);
+          ctx.quadraticCurveTo(x + 30, counterY + 10, x + 64, counterY + 15);
+          ctx.stroke();
+        }
+      }
+
+      function drawPearl(item) {
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rot * 0.3);
+
+        // 柔和黑糖外暈
+        ctx.beginPath();
+        ctx.arc(0, 0, item.radius + 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(139, 77, 36, 0.18)';
+        ctx.fill();
+
+        // 黑糖珍珠主體
+        const grad = ctx.createRadialGradient(-4, -5, 2, 0, 0, item.radius);
+        grad.addColorStop(0, '#7A472A');
+        grad.addColorStop(0.55, '#462819');
+        grad.addColorStop(1, '#2B160C');
+
+        ctx.beginPath();
+        ctx.arc(0, 0, item.radius, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.lineWidth = 2.4;
+        ctx.strokeStyle = '#2B160C';
+        ctx.stroke();
+
+        // Q 彈高光點
+        ctx.beginPath();
+        ctx.ellipse(-item.radius * 0.34, -item.radius * 0.34, item.radius * 0.24, item.radius * 0.16, -0.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFF8EE';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(item.radius * 0.26, item.radius * 0.34, item.radius * 0.1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 248, 238, 0.45)';
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function roundedRectPath(c, x, y, w, h, r) {
+        const radius = Math.min(r, w * 0.5, h * 0.5);
+        c.beginPath();
+        c.moveTo(x + radius, y);
+        c.lineTo(x + w - radius, y);
+        c.quadraticCurveTo(x + w, y, x + w, y + radius);
+        c.lineTo(x + w, y + h - radius);
+        c.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        c.lineTo(x + radius, y + h);
+        c.quadraticCurveTo(x, y + h, x, y + h - radius);
+        c.lineTo(x, y + radius);
+        c.quadraticCurveTo(x, y, x + radius, y);
+        c.closePath();
+      }
+
+      function drawIceCube(item) {
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rot);
+
+        const s = item.radius * 1.65;
+        const half = s * 0.5;
+
+        // 冷氣外圍虛光
+        roundedRectPath(ctx, -half - 3, -half - 3, s + 6, s + 6, 7);
+        ctx.fillStyle = 'rgba(101, 182, 216, 0.22)';
+        ctx.fill();
+
+        // 晶透冰塊本體
+        const grad = ctx.createLinearGradient(-half, -half, half, half);
+        grad.addColorStop(0, '#EEFAFF');
+        grad.addColorStop(0.5, '#BCE7F8');
+        grad.addColorStop(1, '#79C7E6');
+
+        roundedRectPath(ctx, -half, -half, s, s, 6);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.lineWidth = 2.4;
+        ctx.strokeStyle = '#335D73';
+        ctx.stroke();
+
+        // 手繪冰塊反光斜線與冰晶紋理
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-half + 5, -half + 8);
+        ctx.lineTo(-half + 10, -half + 4);
+        ctx.moveTo(-half + 6, half - 7);
+        ctx.lineTo(half - 6, -half + 6);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawCup() {
+        const cup = state.cup;
+        const shakeOffset = cup.shakeTimer > 0 ? Math.sin(cup.shakeTimer * 52) * 5 : 0;
+        const cx = cup.x + shakeOffset;
+        const cy = cup.y;
+        const topHalf = cup.topWidth * 0.5;
+        const botHalf = cup.bottomWidth * 0.5;
+        const halfH = cup.height * 0.5;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        // 地面投影
+        ctx.beginPath();
+        ctx.ellipse(0, halfH + 6, botHalf + 6, 7, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(70, 40, 25, 0.16)';
+        ctx.fill();
+
+        // 粗吸管（插在杯後方右側）
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(14, -halfH + 16);
+        ctx.lineTo(26, -halfH - 26);
+        ctx.lineTo(35, -halfH - 24);
+        ctx.lineTo(23, -halfH + 16);
+        ctx.closePath();
+        ctx.fillStyle = '#D97224';
+        ctx.fill();
+        ctx.lineWidth = 2.6;
+        ctx.strokeStyle = '#462819';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+        ctx.restore();
+
+        // 杯身外輪廓路徑
+        function traceCupBody() {
+          ctx.beginPath();
+          ctx.moveTo(-topHalf, -halfH);
+          ctx.lineTo(topHalf, -halfH);
+          ctx.lineTo(botHalf, halfH - 8);
+          ctx.quadraticCurveTo(botHalf, halfH, botHalf - 10, halfH);
+          ctx.lineTo(-botHalf + 10, halfH);
+          ctx.quadraticCurveTo(-botHalf, halfH, -botHalf, halfH - 8);
+          ctx.closePath();
+        }
+
+        // 透明杯底色
+        traceCupBody();
+        ctx.fillStyle = '#FFF9F0';
+        ctx.fill();
+
+        // 裁切至杯內，繪製奶茶液體與已接到的珍珠
+        ctx.save();
+        traceCupBody();
+        ctx.clip();
+
+        const liquidTop = -halfH + 22;
+        const waveAmp = 3.5 + Math.abs(cup.liquidTilt) * 18;
+        const tiltOffset = cup.liquidTilt * 24;
+
+        ctx.beginPath();
+        ctx.moveTo(-topHalf - 10, liquidTop - tiltOffset);
+        ctx.quadraticCurveTo(
+          -topHalf * 0.4,
+          liquidTop + Math.sin(cup.wavePhase) * waveAmp,
+          0,
+          liquidTop + Math.cos(cup.wavePhase) * (waveAmp * 0.6)
+        );
+        ctx.quadraticCurveTo(
+          topHalf * 0.4,
+          liquidTop - Math.sin(cup.wavePhase) * waveAmp,
+          topHalf + 10,
+          liquidTop + tiltOffset
+        );
+        ctx.lineTo(topHalf + 10, halfH + 10);
+        ctx.lineTo(-topHalf - 10, halfH + 10);
+        ctx.closePath();
+
+        const teaGrad = ctx.createLinearGradient(0, liquidTop, 0, halfH);
+        teaGrad.addColorStop(0, '#E9C196');
+        teaGrad.addColorStop(0.65, '#D49A66');
+        teaGrad.addColorStop(1, '#AE6E3E');
+        ctx.fillStyle = teaGrad;
+        ctx.fill();
+
+        // 黑糖掛壁裝飾紋
+        ctx.strokeStyle = 'rgba(70, 40, 25, 0.22)';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-botHalf + 8, halfH - 18);
+        ctx.quadraticCurveTo(-botHalf + 14, halfH - 8, -botHalf + 22, halfH - 16);
+        ctx.moveTo(botHalf - 14, halfH - 22);
+        ctx.quadraticCurveTo(botHalf - 8, halfH - 10, botHalf - 24, halfH - 12);
+        ctx.stroke();
+
+        // 畫出已收集進杯底的珍珠
+        for (let i = 0; i < cup.collectedVisuals.length; i++) {
+          const pv = cup.collectedVisuals[i];
+          const px = pv.dx;
+          const py = halfH - pv.dy;
+          ctx.beginPath();
+          ctx.arc(px, py, pv.r, 0, Math.PI * 2);
+          ctx.fillStyle = '#3C2012';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(px - 1.6, py - 1.6, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFF8EE';
+          ctx.fill();
+        }
+
+        // 杯身玻璃手繪高光
+        ctx.beginPath();
+        ctx.moveTo(-topHalf + 9, -halfH + 10);
+        ctx.lineTo(-botHalf + 11, halfH - 14);
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+        ctx.stroke();
+
+        ctx.restore();
+
+        // 杯身手繪粗描邊
+        traceCupBody();
+        ctx.lineWidth = 3.2;
+        ctx.strokeStyle = '#462819';
+        ctx.stroke();
+
+        // 杯口開口邊緣
+        roundedRectPath(ctx, -topHalf - 5, -halfH - 5, cup.topWidth + 10, 10, 5);
+        ctx.fillStyle = '#FFFDF8';
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#462819';
+        ctx.stroke();
+
+        // 手搖飲杯上的可愛表情
+        const faceY = 6;
+        ctx.strokeStyle = '#462819';
+        ctx.fillStyle = '#462819';
+        ctx.lineWidth = 2.6;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        if (cup.mood === 'happy') {
+          // 開心彎彎眼
+          ctx.beginPath();
+          ctx.arc(-13, faceY - 2, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(13, faceY - 2, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          ctx.stroke();
+          // 微笑
+          ctx.beginPath();
+          ctx.arc(0, faceY + 3, 6, 0.15 * Math.PI, 0.85 * Math.PI);
+          ctx.stroke();
+          // 腮紅
+          ctx.fillStyle = 'rgba(242, 134, 118, 0.72)';
+          ctx.beginPath();
+          ctx.arc(-20, faceY + 4, 4, 0, Math.PI * 2);
+          ctx.arc(20, faceY + 4, 4, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (cup.mood === 'hurt') {
+          // > < 冰到發抖表情
+          ctx.beginPath();
+          ctx.moveTo(-17, faceY - 6);
+          ctx.lineTo(-10, faceY - 2);
+          ctx.lineTo(-17, faceY + 2);
+          ctx.moveTo(17, faceY - 6);
+          ctx.lineTo(10, faceY - 2);
+          ctx.lineTo(17, faceY + 2);
+          ctx.stroke();
+          // 波浪嘴
+          ctx.beginPath();
+          ctx.moveTo(-7, faceY + 8);
+          ctx.quadraticCurveTo(-3, faceY + 4, 0, faceY + 8);
+          ctx.quadraticCurveTo(3, faceY + 12, 7, faceY + 8);
+          ctx.stroke();
+        } else {
+          // 一般可愛圓眼微笑
+          ctx.beginPath();
+          ctx.arc(-13, faceY - 2, 3.2, 0, Math.PI * 2);
+          ctx.arc(13, faceY - 2, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(0, faceY + 2, 5, 0.2 * Math.PI, 0.8 * Math.PI);
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(242, 148, 132, 0.55)';
+          ctx.beginPath();
+          ctx.arc(-19, faceY + 3, 3.5, 0, Math.PI * 2);
+          ctx.arc(19, faceY + 3, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      function drawParticlesAndTexts() {
+        for (let i = 0; i < state.particles.length; i++) {
+          const p = state.particles[i];
+          const alpha = Math.max(0, p.life / p.maxLife);
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = p.color;
+          if (p.square) {
+            ctx.fillRect(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size);
+          } else {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        for (let i = 0; i < state.floatingTexts.length; i++) {
+          const ft = state.floatingTexts[i];
+          const alpha = Math.max(0, ft.life / ft.maxLife);
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.font = '800 20px "PingFang TC", "Microsoft JhengHei", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = '#FFFDF8';
+          ctx.strokeText(ft.text, ft.x, ft.y);
+          ctx.fillStyle = ft.color;
+          ctx.fillText(ft.text, ft.x, ft.y);
+          ctx.restore();
+        }
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, state.width, state.height);
+        drawBackground();
+
+        for (let i = 0; i < state.items.length; i++) {
+          const item = state.items[i];
+          if (item.type === 'pearl') {
+            drawPearl(item);
+          } else {
+            drawIceCube(item);
+          }
+        }
+
+        drawCup();
+        drawParticlesAndTexts();
+      }
+
+      function loop(ts) {
+        if (!state.lastTs) state.lastTs = ts;
+        const dt = Math.min(0.05, Math.max(0, (ts - state.lastTs) / 1000));
+        state.lastTs = ts;
+
+        update(dt);
+        render();
+        state.rafId = requestAnimationFrame(loop);
+      }
+
+      // 鍵盤操作
+      window.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          state.keys.left = true;
+          if (state.phase === 'PLAYING') e.preventDefault();
+        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          state.keys.right = true;
+          if (state.phase === 'PLAYING') e.preventDefault();
+        } else if (e.key === 'Enter' && state.phase !== 'PLAYING') {
+          if (!startOverlay.classList.contains('hidden')) {
+            startGame();
+          }
         }
       });
-      window.addEventListener('keyup', e => keys[e.key] = false);
-      window.addEventListener('blur', () => keys = {});
 
-      function position(e) {
-        if (!active) return;
-        x = Math.max(23, Math.min(397, (e.clientX - cv.getBoundingClientRect().left) * 420 / cv.getBoundingClientRect().width));
-        draw()
+      window.addEventListener('keyup', function (e) {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          state.keys.left = false;
+        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          state.keys.right = false;
+        }
+      });
+
+      // 滑鼠與觸控拖曳操作（Pointer Events 統一支援桌面滑鼠拖曳與手機觸控拖曳）
+      function getPointerLocalX(clientX) {
+        const rect = canvas.getBoundingClientRect();
+        return clientX - rect.left;
       }
-      cv.addEventListener('pointerdown', e => {
-        cv.setPointerCapture(e.pointerId);
-        position(e)
+
+      canvas.addEventListener('pointerdown', function (e) {
+        if (state.phase !== 'PLAYING') return;
+        audioEngine.ensureCtx();
+        const px = getPointerLocalX(e.clientX);
+        state.dragging = true;
+        // 若點擊在杯身附近則保持偏移，若點在遠處則平滑對齊指針方便初學者操作
+        if (Math.abs(px - state.cup.x) <= state.cup.topWidth * 0.7) {
+          state.dragOffsetX = state.cup.x - px;
+        } else {
+          state.dragOffsetX = 0;
+          const prevX = state.cup.x;
+          state.cup.x = clampCupX(px);
+          state.cup.vx = (state.cup.x - prevX) * 18;
+        }
+        if (canvas.setPointerCapture) {
+          try {
+            canvas.setPointerCapture(e.pointerId);
+          } catch (err) {}
+        }
       });
-      cv.addEventListener('pointermove', e => {
-        if (cv.hasPointerCapture(e.pointerId)) position(e)
+
+      canvas.addEventListener('pointermove', function (e) {
+        if (state.phase !== 'PLAYING' || !state.dragging) return;
+        const px = getPointerLocalX(e.clientX);
+        const targetX = clampCupX(px + state.dragOffsetX);
+        const dx = targetX - state.cup.x;
+        state.cup.vx = dx * 32;
+        state.cup.x = targetX;
       });
-      [
-        ['left', 'ArrowLeft', -35],
-        ['right', 'ArrowRight', 35]
-      ].forEach(([id, key, d]) => {
-        const b = $(id);
-        b.addEventListener('pointerdown', e => {
-          if (!active) return;
-          b.setPointerCapture(e.pointerId);
-          keys[key] = true;
-          move(d);
-          draw()
+
+      function endDrag() {
+        state.dragging = false;
+      }
+
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+      canvas.addEventListener('lostpointercapture', endDrag);
+
+      // 按鈕事件
+      startBtn.addEventListener('click', startGame);
+      restartBtn.addEventListener('click', startGame);
+      backHomeBtn.addEventListener('click', function () {
+        state.phase = 'TITLE_MENU';
+        resetGameState();
+        resultOverlay.classList.add('hidden');
+        startOverlay.classList.remove('hidden');
+      });
+
+      soundToggleBtn.addEventListener('click', function () {
+        audioEngine.enabled = !audioEngine.enabled;
+        soundToggleBtn.setAttribute('aria-pressed', String(audioEngine.enabled));
+        if (audioEngine.enabled) {
+          soundIcon.textContent = '🔊';
+          soundLabel.textContent = '音效：開';
+          audioEngine.ensureCtx();
+          audioEngine.playPearl();
+        } else {
+          soundIcon.textContent = '🔇';
+          soundLabel.textContent = '音效：關';
+        }
+      });
+
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('blur', function () {
+        state.keys.left = false;
+        state.keys.right = false;
+        state.dragging = false;
+      });
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(function () {
+          resizeCanvas();
         });
-        for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(event, () => keys[key] = false);
-        b.addEventListener('click', e => {
-          if (active && e.detail === 0) {
-            move(d);
-            draw()
-          }
-        })
-      });
-      stats();
-      draw();
-    </script>
-  </body>
+        ro.observe(stageWrap);
+      }
+
+      // 初始化
+      resizeCanvas();
+      resetGameState();
+      state.rafId = requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
 </html>
